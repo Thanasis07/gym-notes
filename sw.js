@@ -1,45 +1,57 @@
-const CACHE_NAME = 'gym-notes-cache-v2'; // <-- Αλλάξαμε την έκδοση σε v2!
+const CACHE_NAME = 'gym-notes-cache-v3'; // Πήγαμε στο v3 για να σβήσει το χαλασμένο v2
+
+// ΒΑΛΕ ΜΟΝΟ ΤΑ ΑΡΧΕΙΑ ΠΟΥ ΕΙΣΑΙ 100% ΣΙΓΟΥΡΟΣ ΟΤΙ ΥΠΑΡΧΟΥΝ!
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
-    './style.css',
-    './app.js',
-    './manifest.json',
-    './icon.png'
+    './app.js'
+    // Αν έχεις αρχείο style.css βγάλε τα // από την από κάτω γραμμή
+    // , './style.css' 
 ];
 
-// 1. Εγκατάσταση και αποθήκευση νέων αρχείων
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             return cache.addAll(ASSETS_TO_CACHE);
         })
     );
-    self.skipWaiting(); // <-- Λέει στον browser να πάρει το update ΑΜΕΣΩΣ
+    self.skipWaiting();
 });
 
-// 2. Ενεργοποίηση και ΣΒΗΣΙΜΟ της παλιάς μνήμης (του v1)
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
                     if (cacheName !== CACHE_NAME) {
-                        console.log("Διαγραφή παλιάς μνήμης:", cacheName);
                         return caches.delete(cacheName);
                     }
                 })
             );
         })
     );
-    self.clients.claim(); // <-- Αναλαμβάνει τον έλεγχο χωρίς να χρειάζεται επανεκκίνηση
+    self.clients.claim();
 });
 
-// 3. Όταν ζητάει αρχεία, δώσ' τα από την τοπική μνήμη
 self.addEventListener('fetch', (event) => {
+    // 1. Αγνόησε οτιδήποτε δεν είναι GET (π.χ. αιτήματα εγγραφής/διαγραφής του Firebase)
+    if (event.request.method !== 'GET') return;
+
+    // 2. Αγνόησε τα αιτήματα προς άλλους servers (π.χ. Google Authentication)
+    if (!event.request.url.startsWith(self.location.origin)) return;
+
+    // 3. Network-First: Προσπάθησε να πάρεις το αρχείο από το ίντερνετ. 
+    // Αν πέσει το ίντερνετ (catch), τότε και ΜΟΝΟ τότε, δώσε αυτό που έχεις αποθηκεύσει.
     event.respondWith(
-        caches.match(event.request).then((cachedResponse) => {
-            return cachedResponse || fetch(event.request);
-        })
+        fetch(event.request)
+            .then((networkResponse) => {
+                return caches.open(CACHE_NAME).then((cache) => {
+                    cache.put(event.request, networkResponse.clone());
+                    return networkResponse;
+                });
+            })
+            .catch(() => {
+                return caches.match(event.request);
+            })
     );
 });
