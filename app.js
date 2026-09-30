@@ -135,12 +135,11 @@ document.getElementById('reset-pass-btn').addEventListener('click', () => {
     });
 });
 
-document.querySelectorAll('.theme-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        const theme = e.target.getAttribute('data-theme');
-        document.body.className = theme;
-        localStorage.setItem('gymTheme', theme);
-    });
+card.querySelector('.delete-btn').addEventListener('click', () => {
+    if (confirm("Σίγουρα θέλεις να διαγράψεις αυτή την προπόνηση;")) {
+        card.remove(); // 1. Εξαφανίζει αμέσως την κάρτα από την οθόνη!
+        deleteDoc(doc(db, "workouts", docId)); // 2. Διαγράφει στο παρασκήνιο
+    }
 });
 
 document.getElementById('search-input').addEventListener('input', (e) => {
@@ -379,7 +378,7 @@ document.getElementById('save-btn').addEventListener('click', async () => {
     const workoutNote = document.getElementById('workout-note').value.trim();
 
     try {
-        await addDoc(collection(db, "workouts"), {
+        addDoc(collection(db, "workouts"), {
             userId: currentUser.uid,
             title: title.toUpperCase(),
             exercisesData: exercisesData,
