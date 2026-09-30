@@ -16,7 +16,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-// Σύγχρονη αρχικοποίηση με Offline Cache (Firebase v10)
 const db = initializeFirestore(app, {
     localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
 });
@@ -135,11 +134,12 @@ document.getElementById('reset-pass-btn').addEventListener('click', () => {
     });
 });
 
-card.querySelector('.delete-btn').addEventListener('click', () => {
-    if (confirm("Σίγουρα θέλεις να διαγράψεις αυτή την προπόνηση;")) {
-        card.remove(); // 1. Εξαφανίζει αμέσως την κάρτα από την οθόνη!
-        deleteDoc(doc(db, "workouts", docId)); // 2. Διαγράφει στο παρασκήνιο
-    }
+document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const theme = e.target.getAttribute('data-theme');
+        document.body.className = theme;
+        localStorage.setItem('gymTheme', theme);
+    });
 });
 
 document.getElementById('search-input').addEventListener('input', (e) => {
@@ -219,7 +219,7 @@ async function loadWorkouts() {
 
             const docId = docSnap.id;
 
-            // ΕΔΩ ορίζεται η "card" σωστά για κάθε προπόνηση
+            // Δημιουργία της κάρτας για κάθε προπόνηση
             const card = document.createElement('div');
             card.className = 'workout-card';
 
@@ -240,7 +240,6 @@ async function loadWorkouts() {
 
             card.querySelector('.clone-btn').addEventListener('click', () => openEditor(data.title, data.exercisesData || [], data.workoutNote || ''));
 
-            // Το σωστό κουμπί Διαγραφής με Optimistic UI (διαγράφει αμέσως)
             card.querySelector('.delete-btn').addEventListener('click', () => {
                 if (confirm("Σίγουρα θέλεις να διαγράψεις αυτή την προπόνηση;")) {
                     card.remove();
@@ -342,7 +341,7 @@ function addSetRow(container, type, setNumber, setData = null) {
     container.appendChild(row);
 }
 
-document.getElementById('save-btn').addEventListener('click', async () => {
+document.getElementById('save-btn').addEventListener('click', () => {
     const saveBtn = document.getElementById('save-btn');
     const msg = document.getElementById('save-msg');
     const title = document.getElementById('workout-title').value.trim();
@@ -354,7 +353,7 @@ document.getElementById('save-btn').addEventListener('click', async () => {
 
     document.querySelectorAll('.exercise-box').forEach(box => {
         let type = box.dataset.type;
-        if (!type) return; // Αν είναι το κουτί γενικών σχολίων
+        if (!type) return;
 
         let exObj = { type: type, sets: [], note: box.querySelector('.ex-note').value.trim() };
         if (type === 'classic') {
@@ -388,7 +387,7 @@ document.getElementById('save-btn').addEventListener('click', async () => {
             title: title.toUpperCase(),
             exercisesData: exercisesData,
             totalVolume: totalVolume,
-            workoutNote: workoutNote, // Αποθήκευση γενικού σχολίου
+            workoutNote: workoutNote,
             dateString: getTodayFormatted(),
             createdAtDate: new Date().toISOString(),
             createdAt: serverTimestamp()
@@ -397,7 +396,11 @@ document.getElementById('save-btn').addEventListener('click', async () => {
         triggerConfetti();
         msg.innerText = "Αποθηκεύτηκε!";
         setTimeout(() => { showScreen(listScreen); loadWorkouts(); }, 1200);
-    } catch (e) { msg.style.color = '#ff453a'; msg.innerText = "Σφάλμα!"; saveBtn.disabled = false; }
+    } catch (e) {
+        msg.style.color = '#ff453a';
+        msg.innerText = "Σφάλμα!";
+        saveBtn.disabled = false;
+    }
 });
 
 if ('serviceWorker' in navigator) {
