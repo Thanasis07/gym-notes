@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="el">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gym Notes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ΟΛΕΣ ΟΙ ΟΘΟΝΕΣ ΞΕΚΙΝΑΝΕ ΚΡΥΜΜΕΝΕΣ -->
+    <div id="welcome-screen" class="screen" style="display: none; justify-content: center; align-items: center;">
+        <h1 class="welcome-text">Καλώς ήρθες,<br><span id="welcome-name" style="color: var(--accent);"></span></h1>
+    </div>
+
+    <div id="auth-screen" class="screen" style="display: none;">
+        <h1 class="app-title">Gym Notes</h1>
+        <div class="form-group" id="register-fields" style="display: none;">
+            <input type="text" id="first-name" placeholder="Όνομα">
+            <input type="text" id="last-name" placeholder="Επώνυμο">
+        </div>
+        <div class="form-group">
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="password" placeholder="Κωδικός">
+        </div>
+        <button id="main-auth-btn" class="primary-btn">Είσοδος</button>
+        <button id="toggle-auth-btn" class="text-btn" style="margin-top: 10px;">Δεν έχεις λογαριασμό; Εγγραφή</button>
+        <p id="auth-msg" class="msg"></p>
+    </div>
+
+    <div id="list-screen" class="screen" style="display: none;">
+        <div class="header">
+            <h2>Οι Προπονήσεις μου</h2>
+            <button id="go-settings-btn" class="text-btn" style="font-size: 24px;" title="Ρυθμίσεις">⚙️</button>
+        </div>
+
+        <div id="stats-card" class="stats-box" style="display: none;">
+            <div class="stats-row">
+                <div><span id="stat-count" style="font-size: 20px; font-weight: bold; color: var(--accent);">0</span>
+                    <p style="font-size: 11px; color: #8e8e93;">Προπονήσεις Εβδομάδας</p>
+                </div>
+                <div><span id="stat-volume" style="font-size: 20px; font-weight: bold; color: var(--accent);">0
+                        kg</span>
+                    <p style="font-size: 11px; color: #8e8e93;">Συνολικός Όγκος Εβδομάδας</p>
+                </div>
+            </div>
+            <p id="quote-text" class="quote-text"></p>
+        </div>
+
+        <input type="text" id="search-input" placeholder="🔍 Αναζήτηση προπόνησης..." style="margin-bottom: 20px;">
+
+        <div id="workouts-list" class="list-container"></div>
+        <button id="new-workout-btn" class="floating-btn">📝 Νέα Προπόνηση</button>
+    </div>
+
+    <div id="settings-screen" class="screen" style="display: none;">
+        <div class="header">
+            <button id="back-from-settings-btn" class="text-btn">❮ Πίσω</button>
+            <h2>Ρυθμίσεις</h2>
+        </div>
+
+        <div class="settings-section">
+            <h3>Το Προφίλ μου</h3>
+            <input type="text" id="profile-name-input" placeholder="Το όνομά σου">
+            <button id="save-name-btn" class="primary-btn">Αποθήκευση Ονόματος</button>
+            <p id="settings-msg" class="msg"></p>
+        </div>
+
+        <div class="settings-section">
+            <h3>Εμφάνιση (Themes)</h3>
+            <div class="theme-grid">
+                <button class="theme-btn" data-theme="theme-dark-gold" style="background: #e5b022; color: #000;">Dark
+                    Gold</button>
+                <button class="theme-btn" data-theme="theme-ocean-blue" style="background: #0a84ff; color: #fff;">Ocean
+                    Blue</button>
+                <button class="theme-btn" data-theme="theme-neon-green" style="background: #32d74b; color: #000;">Neon
+                    Green</button>
+                <button class="theme-btn" data-theme="theme-cyberpunk"
+                    style="background: #bb9af7; color: #000;">Cyberpunk</button>
+                <button class="theme-btn" data-theme="theme-crimson-red"
+                    style="background: #ff453a; color: #fff;">Crimson Red</button>
+            </div>
+        </div>
+
+        <div class="settings-section" style="margin-top: 40px;">
+            <button id="reset-pass-btn" class="secondary-btn">Αλλαγή Κωδικού</button>
+            <button id="logout-btn" class="text-btn text-red" style="width: 100%; margin-top: 20px;">Αποσύνδεση</button>
+        </div>
+    </div>
+
+    <div id="editor-screen" class="screen" style="display: none;">
+        <div class="header">
+            <button id="back-btn" class="text-btn">❮ Πίσω</button>
+            <button id="save-btn" class="text-btn" style="font-weight: bold;">Τέλος</button>
+        </div>
+
+        <div class="editor-container">
+            <p id="current-date" class="date-display"></p>
+            <input type="text" id="workout-title" class="title-input" placeholder="Τίτλος ">
+
+            <div class="tools">
+                <button id="add-classic-btn" class="tool-btn">+ Άσκηση</button>
+                <button id="add-superset-btn" class="tool-btn">+ Super Set</button>
+            </div>
+
+            <div id="exercises-container"></div>
+
+            <!-- Γενικό πεδίο σχολίων προπόνησης -->
+            <div class="exercise-box" style="margin-top: 20px;">
+                <input type="text" id="workout-note" placeholder="💬 Σημειώσεις προπόνησης "
+                    style="background-color: var(--surface); padding: 10px; font-size: 14px; border-radius: 8px;">
+            </div>
+        </div>
+        <p id="save-msg" class="msg" style="margin-bottom: 70px;"></p>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>
