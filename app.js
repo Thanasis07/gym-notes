@@ -250,7 +250,10 @@ async function loadWorkouts() {
         document.getElementById('stat-count').innerText = weeklyWorkoutsCount;
         document.getElementById('stat-volume').innerText = grandTotalVolume.toLocaleString() + ' kg';
 
-    } catch (e) { workoutsList.innerHTML = '<p style="text-align:center; color:#ff453a;">Σφάλμα φόρτωσης.</p>'; }
+    } catch (e) {
+        console.error("Το Firebase σταμάτησε τη φόρτωση λόγω αυτού:", e);
+        workoutsList.innerHTML = '<p style="text-align:center; color:#ff453a;">Σφάλμα φόρτωσης.</p>';
+    }
 }
 
 document.getElementById('new-workout-btn').addEventListener('click', () => openEditor("", [], ""));
