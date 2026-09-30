@@ -218,6 +218,8 @@ async function loadWorkouts() {
             }
 
             const docId = docSnap.id;
+
+            // ΕΔΩ ορίζεται η "card" σωστά για κάθε προπόνηση
             const card = document.createElement('div');
             card.className = 'workout-card';
 
@@ -237,12 +239,15 @@ async function loadWorkouts() {
             `;
 
             card.querySelector('.clone-btn').addEventListener('click', () => openEditor(data.title, data.exercisesData || [], data.workoutNote || ''));
-            card.querySelector('.delete-btn').addEventListener('click', async () => {
+
+            // Το σωστό κουμπί Διαγραφής με Optimistic UI (διαγράφει αμέσως)
+            card.querySelector('.delete-btn').addEventListener('click', () => {
                 if (confirm("Σίγουρα θέλεις να διαγράψεις αυτή την προπόνηση;")) {
-                    await deleteDoc(doc(db, "workouts", docId));
-                    loadWorkouts();
+                    card.remove();
+                    deleteDoc(doc(db, "workouts", docId));
                 }
             });
+
             workoutsList.appendChild(card);
         });
 
