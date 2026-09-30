@@ -1,12 +1,8 @@
-const CACHE_NAME = 'gym-notes-cache-v3'; // Πήγαμε στο v3 για να σβήσει το χαλασμένο v2
-
-// ΒΑΛΕ ΜΟΝΟ ΤΑ ΑΡΧΕΙΑ ΠΟΥ ΕΙΣΑΙ 100% ΣΙΓΟΥΡΟΣ ΟΤΙ ΥΠΑΡΧΟΥΝ!
+const CACHE_NAME = 'gym-notes-cache-v4';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
     './app.js'
-    // Αν έχεις αρχείο style.css βγάλε τα // από την από κάτω γραμμή
-    // , './style.css' 
 ];
 
 self.addEventListener('install', (event) => {
@@ -34,14 +30,9 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-    // 1. Αγνόησε οτιδήποτε δεν είναι GET (π.χ. αιτήματα εγγραφής/διαγραφής του Firebase)
     if (event.request.method !== 'GET') return;
-
-    // 2. Αγνόησε τα αιτήματα προς άλλους servers (π.χ. Google Authentication)
     if (!event.request.url.startsWith(self.location.origin)) return;
 
-    // 3. Network-First: Προσπάθησε να πάρεις το αρχείο από το ίντερνετ. 
-    // Αν πέσει το ίντερνετ (catch), τότε και ΜΟΝΟ τότε, δώσε αυτό που έχεις αποθηκεύσει.
     event.respondWith(
         fetch(event.request)
             .then((networkResponse) => {
@@ -50,8 +41,16 @@ self.addEventListener('fetch', (event) => {
                     return networkResponse;
                 });
             })
-            .catch(() => {
-                return caches.match(event.request);
+            .catch(async () => {
+                // 1. Δες αν υπάρχει αποθηκευμένο το αρχείο στη μνήμη
+                const cachedResponse = await caches.match(event.request);
+                if (cachedResponse) {
+                    return cachedResponse;
+                }
+                // 2. Η διόρθωση: Αν είναι εκτός σύνδεσης και ζητάει σελίδα, δώστωνας το index.html αντί για μαύρη οθόνη!
+                if (event.request.mode === 'navigate') {
+                    return caches.match('./index.html');
+                }
             })
     );
 });
