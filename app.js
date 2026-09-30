@@ -389,3 +389,9 @@ document.getElementById('save-btn').addEventListener('click', async () => {
         setTimeout(() => { showScreen(listScreen); loadWorkouts(); }, 1200);
     } catch (e) { msg.style.color = '#ff453a'; msg.innerText = "Σφάλμα!"; saveBtn.disabled = false; }
 });
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+        .then(() => console.log("Service Worker Registered"))
+        .catch(err => console.log("Service Worker Failed", err));
+}
